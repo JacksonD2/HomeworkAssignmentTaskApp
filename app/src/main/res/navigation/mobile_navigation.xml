@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/splashScreenFragment">
+
+    <fragment
+        android:id="@+id/nav_assignments"
+        android:name="com.example.HomeworkAssignmentTaskApp.ui.assignments.AssignmentsFragment"
+        android:label="@string/menu_assignments"
+        tools:layout="@layout/fragment_assignments" >
+        <action
+            android:id="@+id/action_add_new_class"
+            app:destination="@id/nav_add_class"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit" />
+        <action
+            android:id="@+id/action_get_class_info"
+            app:destination="@id/nav_class_info"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit" />
+        <action
+            android:id="@+id/action_add_new_assignment"
+            app:destination="@id/nav_add_assignment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit" />
+        <action
+            android:id="@+id/action_get_assignment_info"
+            app:destination="@id/nav_assignment_info"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.example.HomeworkAssignmentTaskApp.ui.Settings.SettingsFragment"
+        android:label="@string/menu_settings"
+        tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/nav_add_class"
+        android:name="com.example.HomeworkAssignmentTaskApp.ui.assignments.Classes.AddClassFragment"
+        android:label="@string/menu_add_class"
+        tools:layout="@layout/fragment_add_class" >
+        <action
+            android:id="@+id/action_exit_add_class"
+            app:destination="@id/nav_assignments" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_classes"
+        android:name="com.example.HomeworkAssignmentTaskApp.ui.assignments.Classes.ClassesFragment"
+        android:label="fragment_classes"
+        tools:layout="@layout/fragment_classes" >
+    </fragment>
+    <fragment
+        android:id="@+id/nav_class_info"
+        android:name="com.example.HomeworkAssignmentTaskApp.ui.assignments.Classes.ClassInfoFragment"
+        android:label="@string/class_info"
+        tools:layout="@layout/fragment_class_info" >
+        <action
+            android:id="@+id/action_edit_class"
+            app:destination="@id/nav_edit_class" />
+        <action
+            android:id="@+id/action_exit_class_info"
+            app:destination="@id/nav_assignments" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_edit_class"
+        android:name="com.example.HomeworkAssignmentTaskApp.ui.assignments.Classes.EditClassFragment"
+        android:label="@string/menu_edit_class"
+        tools:layout="@layout/fragment_add_class" />
+    <fragment
+        android:id="@+id/splashScreenFragment"
+        android:name="com.example.HomeworkAssignmentTaskApp.ui.SplashScreenFragment"
+        android:label="Welcome!"
+        tools:layout="@layout/fragment_splash_screen">
+        <action
+            android:id="@+id/action_open_app"
+            app:destination="@id/nav_assignments" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_add_assignment"
+        android:name="com.example.HomeworkAssignmentTaskApp.ui.assignments.Upcoming.AddAssignmentFragment"
+        android:label="Add New Assignment"
+        tools:layout="@layout/fragment_add_assignment" />
+    <fragment
+        android:id="@+id/nav_assignment_info"
+        android:name="com.example.HomeworkAssignmentTaskApp.ui.assignments.Upcoming.AssignmentInfoFragment"
+        android:label="Assignment Details"
+        tools:layout="@layout/fragment_assignment_info" />
+
+    <!--<fragment
+        android:id="@+id/nav_gallery"
+        android:name="HomeworkAssignmentTaskAppTaskApp.ui.gallery.GalleryFragment"
+        android:label="@string/menu_gallery"
+        tools:layout="@layout/fragment_gallery" />
+
+    <fragment
+        android:id="@+id/nav_slideshow"
+        android:name="HomeworkAssignmentTaskAppTaskApp.ui.slideshow.SlideshowFragment"
+        android:label="@string/menu_slideshow"
+        tools:layout="@layout/fragment_slideshow" />-->
+
+</navigation>

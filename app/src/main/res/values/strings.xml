@@ -1,0 +1,84 @@
+<resources>
+    <string name="app_name">Homework Assignment Task App</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="tabs_upcoming">Upcoming</string>
+    <string name="tabs_courses">Classes</string>
+    <string name="tabs_completed">Completed</string>
+
+    <string name="menu_assignments">Assignments</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_add_class">Add a Class</string>
+    <string name="menu_edit_class">Edit Class</string>
+
+    <string name="class_list_filename">class_list.txt</string>
+
+    <string-array name="tasks">
+        <item>CS262 Final Exam</item>
+        <item>Project 3 Due</item>
+    </string-array>
+
+    <string-array name="description">
+        <item>description</item>
+        <item>description</item>
+    </string-array>
+
+    <string-array name="priorities">
+        <item>Default</item>
+        <item>Medium</item>
+        <item>High</item>
+        <item>Very High</item>
+    </string-array>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <string name="required_indicator">(*) Required</string>
+
+    <string name="class_name">Class Name</string>
+    <string name="class_start_date">Start Date</string>
+    <string name="class_end_date">End Date</string>
+    <string name="class_instructor_name">Instructor</string>
+    <string name="class_blank"></string>
+    <string name="class_info">Class Details</string>
+    <string name="delete_class">Delete Class</string>
+
+    <string name="add_class_name">Enter Class Name</string>
+    <string name="add_class_instructor">Enter Instructor Name</string>
+    <string name="add_class_start_date">Add Start Date</string>
+    <string name="add_class_end_date">Add End Date</string>
+
+    <string name="assignment_name">Assignment Name</string>
+    <string name="assignment_name_r">Assignment Name(*)</string>
+    <string name="assignment_description">Description</string>
+    <string name="assignment_due_date">Due Date</string>
+    <string name="assignment_due_date_r">Due Date(*)</string>
+    <string name="assignment_priority">Priority</string>
+    <string name="delete_assignment">Delete Assignment</string>
+    <string name="complete_assignment">Complete Assignment</string>
+
+    <string name="add_assignment_name">Enter Assignment Name</string>
+    <string name="add_assignment_description">Enter Description</string>
+    <string name="add_assignment_due_date">Add Due Date</string>
+
+    <string name="data_error">data error</string>
+
+</resources>
