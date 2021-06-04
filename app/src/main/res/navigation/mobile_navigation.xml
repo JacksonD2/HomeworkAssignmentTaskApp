@@ -12,24 +12,24 @@
         tools:layout="@layout/fragment_assignments" >
         <action
             android:id="@+id/action_add_new_class"
-            app:destination="@id/nav_add_class"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit" />
+            app:destination="@id/nav_add_class"/>
+            <!--app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"-->
         <action
             android:id="@+id/action_get_class_info"
-            app:destination="@id/nav_class_info"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit" />
+            app:destination="@id/nav_class_info"/>
+            <!--app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"-->
         <action
             android:id="@+id/action_add_new_assignment"
-            app:destination="@id/nav_add_assignment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit" />
+            app:destination="@id/nav_add_assignment"/>
+            <!--app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"-->
         <action
             android:id="@+id/action_get_assignment_info"
-            app:destination="@id/nav_assignment_info"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit" />
+            app:destination="@id/nav_assignment_info" />
+            <!--app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"-->
     </fragment>
 
     <fragment
@@ -68,7 +68,11 @@
         android:id="@+id/nav_edit_class"
         android:name="com.example.HomeworkAssignmentTaskApp.ui.assignments.Classes.EditClassFragment"
         android:label="@string/menu_edit_class"
-        tools:layout="@layout/fragment_add_class" />
+        tools:layout="@layout/fragment_add_class" >
+        <action
+            android:id="@+id/action_nav_edit_class_to_nav_assignments"
+            app:destination="@id/nav_assignments" />
+    </fragment>
     <fragment
         android:id="@+id/splashScreenFragment"
         android:name="com.example.HomeworkAssignmentTaskApp.ui.SplashScreenFragment"

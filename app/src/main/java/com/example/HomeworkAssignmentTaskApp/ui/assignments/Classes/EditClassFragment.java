@@ -1,35 +1,156 @@
 package com.example.HomeworkAssignmentTaskApp.ui.assignments.Classes;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
+import android.widget.Toast;
 
+import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.HomeworkAssignmentTaskApp.ApplicationViewModel;
 import com.example.HomeworkAssignmentTaskApp.R;
 import com.example.HomeworkAssignmentTaskApp.data.ClassData;
+import com.example.HomeworkAssignmentTaskApp.ui.assignments.AssignmentsFragment;
+import com.example.HomeworkAssignmentTaskApp.ui.assignments.Upcoming.AddAssignmentFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Date;
 
 public class EditClassFragment extends AddClassFragment {
-
-    int currentClass;
+    private int classId;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+
+    @Override
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        //View root = inflater.inflate(R.layout.fragment_add_class, container, false);
+        View root = setUpViews(inflater, container);
+        System.out.println("Reached Here!1");
+
+        appModel.getDeletedClassId().observe(getViewLifecycleOwner(), integer -> {
+            System.out.println("Reached Here!99");
+            appModel.deleteClassById();
+            //appModel.getDeletedClassId().removeObservers(getViewLifecycleOwner());
+            //Navigation.findNavController(requireView()).navigate(R.id.nav_assignments, getArguments());
+            Navigation.findNavController(requireView()).navigateUp();
+            Navigation.findNavController(requireView()).navigateUp();
+        });
+        System.out.println("Reached Here!2");
+
+        //class data
+        ClassData classInfo;
+        if(getArguments()!=null) {
+            classId = getArguments().getInt(ClassesFragment.CLASS_ID);
+            classInfo = appModel.getClassData(classId);
+        }
+        else {
+            classInfo = new ClassData();
+            classId = classInfo.getClassId();
+        }
+        String temp;
+
+        //class name
+        EditText className = root.findViewById(R.id.editTextClassName);
+        className.setText(classInfo.getClassName());
+        //instructor
+        EditText instructorName = root.findViewById(R.id.editTextInstructorName);
+        temp = classInfo.getInstructorName();
+        if(temp!=null) {
+            instructorName.setText(temp);
+        }
+        //dates
+        Date date = classInfo.getStartDate();
+        if(date!=null) {
+            temp = dateFormat.format(date);
+            buttonStartDate.setText(temp);
+        }
+        date = classInfo.getEndDate();
+        if(date!=null) {
+            temp = dateFormat.format(date);
+            buttonEndDate.setText(temp);
+        }
+
+        //fab
+        FloatingActionButton fab = root.findViewById(R.id.fabAddClass);
+        fab.setOnClickListener(view -> {
+            if(finishAddingClass(view, classInfo)!=null) {
+                appModel.updateClass(classInfo);
+                Navigation.findNavController(view).navigateUp();
+            }
+        });
+
+        //delete class
+        buttonDeleteClass = root.findViewById(R.id.buttonDeleteClass);
+        buttonDeleteClass.setOnClickListener(v -> deleteClass());
+        System.out.println("Reached Here!3");
+
+        return root;
+    }
+
+    private void deleteClass(){
+        /*appModel.getClassList().getValue().remove(classId);
+        Navigation.findNavController(view).navigate(R.id.nav_assignments);*/
+        System.out.println("Reached Here!100");
+        DialogFragment newFragment = new DeleteClassDialogFragment(classId);
+        newFragment.show(requireActivity().getSupportFragmentManager(), "class_picker");
+    }
+
+    public static class DeleteClassDialogFragment extends DialogFragment {
+        ApplicationViewModel viewModel;
+        int classId;
+
+        public DeleteClassDialogFragment(int classId){
+            super();
+            this.classId = classId;
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            viewModel = new ViewModelProvider(requireActivity()).get(ApplicationViewModel.class);
+        }
+
+        @NotNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage(R.string.dialog_delete_class)
+                    .setPositiveButton(R.string.yes, (dialog, id) -> {
+                        // FIRE ZE MISSILES!
+                        viewModel.setDeletedClassId(classId);
+                        //viewModel.deleteClassById(classId);
+                    })
+                    .setNegativeButton(R.string.no, (dialog, id) -> {
+                        // User cancelled the dialog
+                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
+        }
+    }
+}
+
+/*
+        @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_add_class, container, false);
+        //View root = inflater.inflate(R.layout.fragment_add_class, container, false);
+        View root = setUpViews(inflater, container);
         //ViewModel
         appModel = new ViewModelProvider(requireActivity()).get(ApplicationViewModel.class);
 
@@ -38,7 +159,7 @@ public class EditClassFragment extends AddClassFragment {
         ClassData classInfo = appModel.getClassList().getValue().get(currentClass);
         String temp;
         //colors
-        spinner = (Spinner) root.findViewById(R.id.spinnerColors);
+        /*spinner = (Spinner) root.findViewById(R.id.spinnerColors);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireContext(),
                 R.array.color_options, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -54,71 +175,72 @@ public class EditClassFragment extends AddClassFragment {
 
             }
         });
-        //class name
-        EditText className = root.findViewById(R.id.editTextClassName);
+//class name
+EditText className = root.findViewById(R.id.editTextClassName);
         className.setText(classInfo.getClassName());
-        //instructor
-        EditText instructorName = root.findViewById(R.id.editTextInstructorName);
-        temp = classInfo.getInstructorName();
-        if(temp!=null) {
-            instructorName.setText(temp);
+                //instructor
+                EditText instructorName = root.findViewById(R.id.editTextInstructorName);
+                temp = classInfo.getInstructorName();
+                if(temp!=null) {
+                instructorName.setText(temp);
+                }
+                //dates
+                Date date;
+                //start date
+                buttonStartDate = (Button) root.findViewById(R.id.buttonStartDate);
+                buttonStartDate.setOnClickListener(new View.OnClickListener() {
+public void onClick(View v) {
+        showDatePickerDialog(buttonStartDate);
         }
-        //dates
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date date;
-        //start date
-        buttonStartDate = (Button) root.findViewById(R.id.buttonStartDate);
-        buttonStartDate.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                showDatePickerDialog(buttonStartDate);
-            }
         });
         date = classInfo.getStartDate();
         if(date!=null) {
-            temp = dateFormat.format(date);
-            buttonStartDate.setText(temp);
+        temp = setDateFormat.format(date);
+        buttonStartDate.setText(temp);
         }
         //end date
         buttonEndDate = (Button) root.findViewById(R.id.buttonEndDate);
         buttonEndDate.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                showDatePickerDialog(buttonEndDate);
-            }
+public void onClick(View v) {
+        showDatePickerDialog(buttonEndDate);
+        }
         });
         date = classInfo.getEndDate();
         if(date!=null) {
-            temp = dateFormat.format(date);
-            buttonEndDate.setText(temp);
+        temp = dateFormat.format(date);
+        buttonEndDate.setText(temp);
         }
         //delete class
         buttonDeleteClass = root.findViewById(R.id.buttonDeleteClass);
         buttonDeleteClass.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                deleteClass(v);
-            }
+public void onClick(View v) {
+        deleteClass(v);
+        }
         });
 
         //fab
         FloatingActionButton fab = root.findViewById(R.id.fabAddClass);
         fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finishAddingClass(view);
-            }
+@Override
+public void onClick(View view) {
+        finishAddingClass(view);
+        }
         });
 
         return root;
-    }
+        }
+ */
 
-    @Override
+    /*@Override
     protected void finishAddingClass(View view){
         EditText editTextClassName = (EditText) requireActivity().findViewById(R.id.editTextClassName);
         String className = editTextClassName.getText().toString();
 
         closeKeyboard(view);
-        System.out.println(className);
-
-        if(!(className.equals("") || className.equals(" "))) {
+        if(className.equals("") || className.equals(" ")) {
+            Toast.makeText(requireContext(), errorClassName, Toast.LENGTH_LONG).show();
+        }
+        else {
             ClassData classInfo = appModel.getClassList().getValue().get(currentClass);
 
             //optional information
@@ -137,9 +259,4 @@ public class EditClassFragment extends AddClassFragment {
             appModel.updateClass(classInfo);
             Navigation.findNavController(view).navigateUp();
         }
-    }
-    private void deleteClass(View view){
-        appModel.getClassList().getValue().remove(currentClass);
-        Navigation.findNavController(view).navigate(R.id.nav_assignments);
-    }
-}
+    }*/

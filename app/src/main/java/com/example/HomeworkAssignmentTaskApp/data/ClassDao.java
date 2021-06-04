@@ -34,4 +34,11 @@ public interface ClassDao {
 
     @Delete
     void deleteClass(ClassData classData);
+
+    @Delete(entity = ClassData.class)
+    void deleteClass(ClassId... classId);
+
+    class ClassId {
+        public int classId;
+    }
 }

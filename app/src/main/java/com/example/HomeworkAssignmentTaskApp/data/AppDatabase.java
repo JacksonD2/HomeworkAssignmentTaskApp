@@ -9,6 +9,8 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -45,8 +47,28 @@ public abstract class AppDatabase extends RoomDatabase {
                 System.out.println("database begin loading!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 AssignmentDao assignmentDao = instance.assignmentDao();
                 assignmentDao.deleteAll();
-                assignmentDao.insertAssignment(new AssignmentData("Project 3"));
-                assignmentDao.insertAssignment(new AssignmentData("Book Essay"));
+
+                AssignmentData temp = new AssignmentData("Project 3");
+                Date date = new Date(System.currentTimeMillis());
+                temp.setDueDate(date);
+                //temp.setComplete(true);
+                assignmentDao.insertAssignment(temp);
+                temp = new AssignmentData("Book Essay");
+                Calendar c = Calendar.getInstance();
+                c.setTime(date);
+                c.add(Calendar.DATE, 3); //add days
+                date = c.getTime();
+                temp.setDueDate(date);
+                //temp.setComplete(true);
+                assignmentDao.insertAssignment(temp);
+                temp = new AssignmentData("Exam");
+                c.add(Calendar.DATE, 2);
+                temp.setDueDate(c.getTime());
+                assignmentDao.insertAssignment(temp);
+                temp = new AssignmentData("Worksheet");
+                c.add(Calendar.DATE, 1);
+                temp.setDueDate(c.getTime());
+                assignmentDao.insertAssignment(temp);
 
                 ClassDao classDao = instance.classDao();
                 classDao.deleteAll();

@@ -1,6 +1,10 @@
 package com.example.HomeworkAssignmentTaskApp;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 
 import com.example.HomeworkAssignmentTaskApp.data.AssignmentData;
@@ -23,31 +27,28 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String CHANNEL_ID = "Main_Channel";
     private AppBarConfiguration mAppBarConfiguration;
-    ArrayList<ClassObject> classList;
-    ArrayList<AssignmentData> assignmentList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        createNotificationChannel();
 
         //ViewModel
         ApplicationViewModel appViewModel = new ViewModelProvider(this).get(ApplicationViewModel.class);
-        appViewModel.getClassList().observe(this, new Observer<List<ClassData>>() {
-            @Override
-            public void onChanged(List<ClassData> classData) {
-                //appViewModel.appDatabase.classDao().getAllClasses();
-            }
+        appViewModel.getClassList().observe(this, classData -> {
+            //appViewModel.appDatabase.classDao().getAllClasses();
         });
-        appViewModel.getAssignmentList().observe(this, new Observer<List<AssignmentData>>() {
-            @Override
-            public void onChanged(List<AssignmentData> assignmentData) {
-                if(assignmentData == null){
+        appViewModel.getAssignmentList().observe(this, assignmentData -> {
 
-                }
-            }
+        });
+        appViewModel.getIncompleteAssignmentList().observe(this, assignmentData -> {
+
+        });
+        appViewModel.getCompleteAssignmentList().observe(this, assignmentData -> {
+
         });
 
         //Action/tool bar
@@ -82,6 +83,22 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 }
 

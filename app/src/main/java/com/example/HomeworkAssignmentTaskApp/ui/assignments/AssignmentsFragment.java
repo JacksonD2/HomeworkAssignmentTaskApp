@@ -20,10 +20,11 @@ import java.util.ArrayList;
 
 public class AssignmentsFragment extends Fragment {
 
-    ViewPager2 pager;
-    TabLayout mTabLayout;
-    ArrayList<ClassObject> classList;
-    ArrayList<AssignmentData> assignmentList;
+    private ViewPager2 pager;
+    private TabLayout mTabLayout;
+    public static final String TAB_NUMBER = "tab";
+    //ArrayList<ClassObject> classList;
+   // ArrayList<AssignmentData> assignmentList;
 
     public AssignmentsFragment() {
         // Required empty public constructor
@@ -38,27 +39,19 @@ public class AssignmentsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_assignments, container, false);
 
-        //classList = new ArrayList<ClassData>();
-        //FileManager.readStoredData(savedInstanceState, requireContext(), classList, assignmentList);
-        //AssignmentsViewModel viewModel = new ViewModelProvider(requireActivity()).get(AssignmentsViewModel.class);
-        //viewModel.getClassList().setValue(classList);
-
         //Floating action button on bottom right
         FloatingActionButton fab = root.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle bundle = new Bundle();
-                switch(pager.getCurrentItem()){
-                    case 0:
-                        bundle.putInt("tab", 0);
-                        Navigation.findNavController(view).navigate(R.id.action_add_new_assignment, bundle);
-                        break;
-                    case 1:
-                        bundle.putInt("tab", 1);
-                        Navigation.findNavController(view).navigate(R.id.action_add_new_class, bundle);
-                        break;
-                }
+        fab.setOnClickListener(view -> {
+            Bundle bundle = new Bundle();
+            switch(pager.getCurrentItem()){
+                case 0:
+                    bundle.putInt(TAB_NUMBER, 0);
+                    Navigation.findNavController(view).navigate(R.id.action_add_new_assignment, bundle);
+                    break;
+                case 1:
+                    bundle.putInt(TAB_NUMBER, 1);
+                    Navigation.findNavController(view).navigate(R.id.action_add_new_class, bundle);
+                    break;
             }
         });
         //fab.setOnClickListener(Navigation.createNavigateOnClickListener(R.id.addClassFragment, null));
@@ -81,6 +74,27 @@ public class AssignmentsFragment extends Fragment {
             }
         });
 
+        return root;
+    }
+
+    @Override
+    public void onResume (){
+        super.onResume();
+        mTabLayout.setScrollPosition(pager.getCurrentItem(),0f,true);
+    }
+}
+
+/*
+                if(getArguments()!=null) {
+                    System.out.println("\n\n\n\nadssssssasdddddddddddddddddddddddqweqwewqe \n\n\nweq qwwqe qwe ");
+                    int tabIndex = getArguments().getInt("tab");
+                    pager.setCurrentItem(tabIndex, false);
+                    mTabLayout.setScrollPosition(tabIndex,0f,true);
+                }
+ */
+
+
+
         /*if(savedInstanceState!=null) {
             System.out.println("\n\n\n\nadssssssasdddddddddddddddddddddddqweqwewqe \n\n\nweq qwwqe qwe ");
             int tabIndex = savedInstanceState.getInt("tab");
@@ -88,9 +102,9 @@ public class AssignmentsFragment extends Fragment {
             mTabLayout.setScrollPosition(tabIndex,0f,true);
         }*/
 
-        //mTabLayout.setScrollPosition(pager.getCurrentItem(),0f,true);
+//mTabLayout.setScrollPosition(pager.getCurrentItem(),0f,true);
 
-        //custom back button
+//custom back button
         /*OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -105,8 +119,7 @@ public class AssignmentsFragment extends Fragment {
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this.getViewLifecycleOwner(), callback);*/
 
-        return root;
-    }
+
 
     /*@Override
     public void onViewCreated (@NotNull View view, Bundle savedInstanceState){
@@ -129,19 +142,3 @@ public class AssignmentsFragment extends Fragment {
         super.onSaveInstanceState(outState);
         outState.putInt("tab", mTabLayout.getSelectedTabPosition());
     }*/
-
-    @Override
-    public void onResume (){
-        super.onResume();
-        mTabLayout.setScrollPosition(pager.getCurrentItem(),0f,true);
-    }
-}
-
-/*
-                if(getArguments()!=null) {
-                    System.out.println("\n\n\n\nadssssssasdddddddddddddddddddddddqweqwewqe \n\n\nweq qwwqe qwe ");
-                    int tabIndex = getArguments().getInt("tab");
-                    pager.setCurrentItem(tabIndex, false);
-                    mTabLayout.setScrollPosition(tabIndex,0f,true);
-                }
- */

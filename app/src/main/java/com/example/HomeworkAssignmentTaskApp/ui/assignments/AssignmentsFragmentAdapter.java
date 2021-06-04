@@ -14,8 +14,8 @@ import java.util.ArrayList;
 
 public class AssignmentsFragmentAdapter extends FragmentStateAdapter {
 
-    ArrayList<ClassObject> classList;
-    ArrayList<AssignmentData> assignmentList;
+    //ArrayList<ClassObject> classList;
+    //ArrayList<AssignmentData> assignmentList;
 
     /*public AssignmentsFragmentAdapter(@NonNull FragmentActivity fragmentActivity){
         super(fragmentActivity);
@@ -25,10 +25,10 @@ public class AssignmentsFragmentAdapter extends FragmentStateAdapter {
         super(fragment);
     }
 
-    public AssignmentsFragmentAdapter(@NonNull Fragment fragment,
+    /*public AssignmentsFragmentAdapter(@NonNull Fragment fragment,
                                       ArrayList<ClassObject> classes, ArrayList<AssignmentData> assignments) {
         super(fragment);
-    }
+    }*/
 
     @NonNull
     @Override

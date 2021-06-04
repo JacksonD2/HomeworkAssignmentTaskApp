@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Date;
 
 @Entity(tableName = "assignments")
-public class AssignmentData {
+public class AssignmentData implements Comparable<AssignmentData> {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "assignmentId")
@@ -18,7 +18,7 @@ public class AssignmentData {
 
     @NonNull
     @ColumnInfo(name = "assignmentName")
-    private String assignmentName;
+    private String assignmentName = "";
 
     @ColumnInfo(name = "priority")
     private int priority;
@@ -38,14 +38,15 @@ public class AssignmentData {
     public AssignmentData(){}
 
     @Ignore
-    public AssignmentData(String name){
+    public AssignmentData(@NotNull String name){
         assignmentName = name;
+        classId = -1;
         isComplete = false;
         priority = 0;
     }
 
     @Ignore
-    public AssignmentData(String name, int id){
+    public AssignmentData(@NotNull String name, int id){
         assignmentName = name;
         classId = id;
         isComplete = false;
@@ -109,5 +110,12 @@ public class AssignmentData {
 
     public void setComplete(boolean complete) {
         isComplete = complete;
+    }
+
+    @Override
+    public int compareTo(AssignmentData assignmentData) {
+        if (getDueDate() == null || assignmentData.getDueDate() == null)
+            return 0;
+        return getDueDate().compareTo(assignmentData.getDueDate());
     }
 }

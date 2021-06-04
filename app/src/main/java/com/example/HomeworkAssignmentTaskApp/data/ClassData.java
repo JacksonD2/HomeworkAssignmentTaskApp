@@ -3,6 +3,8 @@ package com.example.HomeworkAssignmentTaskApp.data;
 import androidx.annotation.NonNull;
 import androidx.room.*;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Date;
 
 @Entity(tableName = "classes")
@@ -18,7 +20,7 @@ public class ClassData {
 
     @NonNull
     @ColumnInfo(name = "className")
-    private String className;
+    private String className = "";
 
     @ColumnInfo(name = "instructorName")
     private String instructorName;
@@ -36,13 +38,13 @@ public class ClassData {
     public ClassData(){}
 
     @Ignore
-    public ClassData(String name){
+    public ClassData(@NotNull String name){
         //classId = id;
         className = name;
     }
 
     @Ignore
-    public ClassData(String name, Date start, Date end){
+    public ClassData(@NotNull String name, Date start, Date end){
         className = name;
         startDate = start;
         endDate = end;
@@ -55,8 +57,7 @@ public class ClassData {
         return classId;
     }
 
-    @NonNull
-    public void setClassName(String name){
+    public void setClassName(@NotNull String name){
         className = name;
     }
     @NonNull
@@ -90,5 +91,11 @@ public class ClassData {
     }
     public String getClassColor(){
         return classColor;
+    }
+
+    @NotNull
+    @Override
+    public java.lang.String toString() {
+        return getClassName();
     }
 }

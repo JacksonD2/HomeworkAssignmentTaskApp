@@ -22,19 +22,9 @@ import java.util.List;
 
 
 public class ClassesFragment extends Fragment {
-
-    ClassListAdapter listAdapter;
-    RecyclerView recyclerView;
-    private ArrayList<ClassObject> classList;
-
-    public ClassesFragment() {
-        super(R.layout.fragment_classes);
-    }
-
-    public ClassesFragment(ArrayList<ClassObject> classes) {
-        super(R.layout.fragment_classes);
-        classList = classes;
-    }
+    private ClassListAdapter listAdapter;
+    private RecyclerView recyclerView;
+    public static final String CLASS_ID = "class_id";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,13 +32,7 @@ public class ClassesFragment extends Fragment {
         View root =  inflater.inflate(R.layout.fragment_classes, container, false);
 
         ApplicationViewModel appModel = new ViewModelProvider(requireActivity()).get(ApplicationViewModel.class);
-        appModel.getClassList().observe(getViewLifecycleOwner(), new Observer<List<ClassData>>() {
-            @Override
-            public void onChanged(List<ClassData> classData) {
-                //appViewModel.appDatabase.classDao().getAllClasses();
-                listAdapter.notifyDataSetChanged();
-            }
-        });
+        appModel.getClassList().observe(getViewLifecycleOwner(), classData -> listAdapter.notifyDataSetChanged());
 
         recyclerView = root.findViewById(R.id.class_list);
         listAdapter = new ClassListAdapter(getContext(), appModel);

@@ -14,6 +14,12 @@ public interface AssignmentDao {
     @Query("Select * from assignments")
     LiveData<List<AssignmentData>> getAllAssignments();
 
+    @Query("Select * from assignments Where isComplete = 0")
+    LiveData<List<AssignmentData>> getIncompleteAssignments();
+
+    @Query("Select * from assignments Where isComplete = 1")
+    LiveData<List<AssignmentData>> getCompleteAssignments();
+
     @Query("DELETE FROM assignments")
     void deleteAll();
 

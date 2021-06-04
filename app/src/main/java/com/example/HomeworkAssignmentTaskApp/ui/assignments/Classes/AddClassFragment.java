@@ -1,10 +1,15 @@
 package com.example.HomeworkAssignmentTaskApp.ui.assignments.Classes;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
@@ -12,18 +17,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.HomeworkAssignmentTaskApp.ApplicationViewModel;
 import com.example.HomeworkAssignmentTaskApp.data.ClassData;
 import com.example.HomeworkAssignmentTaskApp.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -33,15 +41,13 @@ public class AddClassFragment extends Fragment implements DatePickerDialog.OnDat
     //ApplicationViewModel appModel;
     protected ApplicationViewModel appModel;
     protected Spinner spinner;
-    protected Button buttonStartDate, buttonEndDate, buttonDeleteClass;
+    protected Button buttonStartDate, buttonEndDate, buttonColor, buttonDeleteClass;
     protected Date startDate, endDate;
+    protected final String errorClassName = "Class name must not be blank!";
+    protected final DateFormat dateFormat = ApplicationViewModel.setDateFormat;
     //String tab = "tab";
     //int classTab = 1;
     //String startDate = "startDate", endDate = "endDate";
-
-    public AddClassFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,91 +55,63 @@ public class AddClassFragment extends Fragment implements DatePickerDialog.OnDat
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View root = setUpViews(inflater, container);
+
+        //fab
+        FloatingActionButton fab = root.findViewById(R.id.fabAddClass);
+        fab.setOnClickListener(view -> {
+            ClassData classInfo = finishAddingClass(view, null);
+            if(classInfo!=null) {
+                appModel.insertClass(classInfo);
+                Navigation.findNavController(view).navigateUp();
+            }
+        });
+
+        //delete class
+        buttonDeleteClass = root.findViewById(R.id.buttonDeleteClass);
+        buttonDeleteClass.setVisibility(View.GONE);
+
+        return root;
+    }
+
+    protected View setUpViews(LayoutInflater inflater, ViewGroup container){
         View root =  inflater.inflate(R.layout.fragment_add_class, container, false);
 
         //ViewModel
         appModel = new ViewModelProvider(requireActivity()).get(ApplicationViewModel.class);
 
-        //spinner
-        //colors
-        spinner = (Spinner) root.findViewById(R.id.spinnerColors);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireContext(),
-                R.array.color_options, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
         //buttons
-        buttonDeleteClass = root.findViewById(R.id.buttonDeleteClass);
-        buttonDeleteClass.setVisibility(View.GONE);
+        buttonColor = root.findViewById(R.id.buttonColor);
+        buttonColor.setOnClickListener(v -> {
+
+        });
         //dates
-        buttonStartDate = (Button) root.findViewById(R.id.buttonStartDate);
-        buttonStartDate.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                showDatePickerDialog(buttonStartDate);
-            }
-        });
-        buttonEndDate = (Button) root.findViewById(R.id.buttonEndDate);
-        buttonEndDate.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                showDatePickerDialog(buttonEndDate);
-            }
-        });
-
-        //fab
-        FloatingActionButton fab = root.findViewById(R.id.fabAddClass);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finishAddingClass(view);
-            }
-        });
-
-        //custom back button
-        /*OnBackPressedCallback callback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                // Handle the back button event
-                //NavBackStackEntry navBackStackEntry = Navigation.findNavController(root).getBackStackEntry(R.id.nav_classes);
-                //Navigation.findNavController(root).navigateUp();
-                //Navigation.findNavController(root).navigate(R.id.nav_assignments);
-                //Navigation.findNavController(root).navigate(R.id.nav_classes);
-
-                //Bundle bundle = new Bundle();
-                //bundle.putInt(tab, classTab);
-                //Navigation.findNavController(root).navigate(R.id.action_exit_add_class, bundle);
-
-                Navigation.findNavController(root).navigate(R.id.action_exit_add_class);
-            }
-        };
-        requireActivity().getOnBackPressedDispatcher().addCallback(this.getViewLifecycleOwner(), callback);*/
+        buttonStartDate = root.findViewById(R.id.buttonStartDate);
+        buttonStartDate.setOnClickListener(v -> showDatePickerDialog(buttonStartDate));
+        buttonEndDate = root.findViewById(R.id.buttonEndDate);
+        buttonEndDate.setOnClickListener(v -> showDatePickerDialog(buttonEndDate));
 
         return root;
     }
 
-    protected void finishAddingClass(View view){
-        closeKeyboard(view);
-        EditText editTextClassName = (EditText) requireActivity().findViewById(R.id.editTextClassName);
+    protected ClassData finishAddingClass(View view, ClassData classInfo){
+        EditText editTextClassName = requireActivity().findViewById(R.id.editTextClassName);
         String className = editTextClassName.getText().toString();
-        System.out.println(className);
-        //Boolean wasAdded = FileManager.addNewClass(message, view, model);
-        if(!(className.equals("") || className.equals(" "))) {
-            ClassData classInfo = new ClassData(className);
+
+        if(className.equals("") || className.equals(" ")) {
+            Toast.makeText(requireContext(), errorClassName, Toast.LENGTH_LONG).show();
+            return null;
+        }
+        else {
+            closeKeyboard(view);
+            if(classInfo==null) {
+                classInfo = new ClassData(className);
+            }
 
             //optional information
-            EditText editTextInstructorName = (EditText) requireActivity().findViewById(R.id.editTextInstructorName);
+            EditText editTextInstructorName = requireActivity().findViewById(R.id.editTextInstructorName);
             String instructorName = editTextInstructorName.getText().toString();
             if(!(instructorName.equals("") || instructorName.equals(" "))){
                 classInfo.setInstructorName(instructorName);
@@ -145,12 +123,7 @@ public class AddClassFragment extends Fragment implements DatePickerDialog.OnDat
                 classInfo.setEndDate(endDate);
             }
 
-            appModel.insertClass(classInfo);
-            //Bundle bundle = new Bundle();
-            //bundle.putInt(tab, classTab);
-            //Navigation.findNavController(view).navigate(R.id.action_exit_add_class, bundle);
-
-            Navigation.findNavController(view).navigate(R.id.action_exit_add_class);
+            return classInfo;
         }
     }
 
@@ -162,7 +135,7 @@ public class AddClassFragment extends Fragment implements DatePickerDialog.OnDat
         }
     }
 
-    protected void showDatePickerDialog(Button button) {
+    private void showDatePickerDialog(Button button) {
         final Calendar c = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), this, c.get(Calendar.YEAR),
                 c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
@@ -172,16 +145,17 @@ public class AddClassFragment extends Fragment implements DatePickerDialog.OnDat
 
     @Override
     public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-        String text = String.format("%d/%d/%d", i1+1, i2, i);
         Calendar c = Calendar.getInstance();
         c.set(i, i1, i2);
+        Date dateSet = c.getTime();
+        String text = ApplicationViewModel.setDateFormat.format(dateSet);
         if(datePicker.getTag().equals(buttonStartDate)) {
             buttonStartDate.setText(text);
-            startDate = c.getTime();
+            startDate = dateSet;
         }
         else if(datePicker.getTag().equals(buttonEndDate)){
             buttonEndDate.setText(text);
-            endDate = c.getTime();
+            endDate = dateSet;
         }
     }
 
@@ -236,3 +210,85 @@ public class AddClassFragment extends Fragment implements DatePickerDialog.OnDat
 
         }
     }*/
+
+        /*//spinner
+        //colors
+        spinner = (Spinner) root.findViewById(R.id.spinnerColors);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireContext(),
+                R.array.color_options, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });*/
+
+
+//custom back button
+        /*OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Handle the back button event
+                //NavBackStackEntry navBackStackEntry = Navigation.findNavController(root).getBackStackEntry(R.id.nav_classes);
+                //Navigation.findNavController(root).navigateUp();
+                //Navigation.findNavController(root).navigate(R.id.nav_assignments);
+                //Navigation.findNavController(root).navigate(R.id.nav_classes);
+
+                //Bundle bundle = new Bundle();
+                //bundle.putInt(tab, classTab);
+                //Navigation.findNavController(root).navigate(R.id.action_exit_add_class, bundle);
+
+                Navigation.findNavController(root).navigate(R.id.action_exit_add_class);
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this.getViewLifecycleOwner(), callback);
+
+                FloatingActionButton fab = root.findViewById(R.id.fabAddClass);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ClassData classInfo = finishAddingClass(view);
+                if(classInfo!=null) {
+                    appModel.insertClass(classInfo);
+                    Navigation.findNavController(view).navigateUp();
+                }
+            }
+        });
+
+            protected void finishAddingClass2(View view){
+        EditText editTextClassName = (EditText) requireActivity().findViewById(R.id.editTextClassName);
+        String className = editTextClassName.getText().toString();
+
+        if(className.equals("") || className.equals(" ")) {
+            Toast.makeText(requireContext(), errorClassName, Toast.LENGTH_LONG).show();
+        }
+        else {
+            closeKeyboard(view);
+            ClassData classInfo = new ClassData(className);
+
+            //optional information
+            EditText editTextInstructorName = (EditText) requireActivity().findViewById(R.id.editTextInstructorName);
+            String instructorName = editTextInstructorName.getText().toString();
+            if(!(instructorName.equals("") || instructorName.equals(" "))){
+                classInfo.setInstructorName(instructorName);
+            }
+            if(startDate!=null){
+                classInfo.setStartDate(startDate);
+            }
+            if(endDate!=null){
+                classInfo.setEndDate(endDate);
+            }
+
+            appModel.insertClass(classInfo);
+            Navigation.findNavController(view).navigateUp();
+        }
+    }
+
+        */

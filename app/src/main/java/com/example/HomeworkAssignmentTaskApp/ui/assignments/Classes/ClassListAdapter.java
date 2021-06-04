@@ -8,23 +8,25 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.HomeworkAssignmentTaskApp.ApplicationViewModel;
 import com.example.HomeworkAssignmentTaskApp.R;
-import com.example.HomeworkAssignmentTaskApp.deprecated.ClassObject;
+import com.example.HomeworkAssignmentTaskApp.data.ClassData;
 
-import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Objects;
 
 public class ClassListAdapter extends RecyclerView.Adapter<ClassListAdapter.ClassListViewHolder>{
 
     //private ArrayList<ClassObject> classList;
     private Context context;
-    private MutableLiveData<ArrayList<ClassObject>> mClassList;
+    //private MutableLiveData<ArrayList<ClassObject>> mClassList;
     //AssignmentsViewModel viewModel;
-    ApplicationViewModel viewModel2;
+    private ApplicationViewModel appModel;
 
     /*public ClassListAdapter(Context ct, ArrayList<ClassObject> list){
         context = ct;
@@ -43,7 +45,7 @@ public class ClassListAdapter extends RecyclerView.Adapter<ClassListAdapter.Clas
 
     public ClassListAdapter(Context ct, ApplicationViewModel model) {
         context = ct;
-        viewModel2 = model;
+        appModel = model;
     }
 
     @NonNull
@@ -68,31 +70,68 @@ public class ClassListAdapter extends RecyclerView.Adapter<ClassListAdapter.Clas
     public void onBindViewHolder(@NonNull ClassListAdapter.ClassListViewHolder holder, int position) {
         //holder.class_name_txt.setText(viewModel.getClassList().getValue().get(position).getCourseName());
         //holder.class_name_txt.setText(viewModel2.getClassList()..get(position).getCourseName());
-        holder.class_name_txt.setText(viewModel2.getClassList().getValue().get(position).getClassName());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle bundle = new Bundle();
-                bundle.putInt("position", position);
-                bundle.putInt("tab", 1);
-                Navigation.findNavController(view).navigate(R.id.action_get_class_info, bundle);
-                //Navigation.findNavController(view).navigate(R.id.action_get_class_info);
-            }
+        ClassData currentClass = Objects.requireNonNull(appModel.getClassList().getValue()).get(position);
+        holder.class_name_txt.setText(currentClass.getClassName());
+        formatDate(holder, currentClass);
+
+        holder.itemView.setOnClickListener(view -> {
+            Bundle bundle = new Bundle();
+            bundle.putInt(ClassesFragment.CLASS_ID, currentClass.getClassId());
+            bundle.putInt("tab", 1);
+            Navigation.findNavController(view).navigate(R.id.action_get_class_info, bundle);
         });
     }
 
     @Override
     public int getItemCount() {
-        //return viewModel.getClassList().getValue().size();
-        return viewModel2.getClassList().getValue().size();
+        return Objects.requireNonNull(appModel.getClassList().getValue()).size();
     }
 
-    public class ClassListViewHolder extends RecyclerView.ViewHolder{
-        private final TextView class_name_txt;
+    private void formatDate(ClassListAdapter.ClassListViewHolder holder,  ClassData currentClass){
+        Date startDate = currentClass.getStartDate(), endDate = currentClass.getEndDate(),
+                currentDate = new Date(System.currentTimeMillis());
+
+        DateFormat dateFormat = ApplicationViewModel.setDateFormat;
+        if(startDate==null){
+            if(endDate==null){
+                holder.class_date_txt.setText("");
+            }
+            else if (currentDate.compareTo(endDate) > 0){
+                holder.class_date_txt.setText(context.getString(R.string.date_ended_on, dateFormat.format(endDate)));
+            }
+            else {
+                holder.class_date_txt.setText(context.getString(R.string.date_ends_on, dateFormat.format(endDate)));
+            }
+        }
+        else if(endDate==null){
+            if (currentDate.compareTo(startDate) > 0) {
+                holder.class_date_txt.setText(context.getString(R.string.date_started_on, dateFormat.format(startDate)));
+            }
+            else {
+                holder.class_date_txt.setText(context.getString(R.string.date_starts_on, dateFormat.format(startDate)));
+            }
+        }
+        else if (currentDate.compareTo(startDate) > 0) {
+            if (currentDate.compareTo(endDate) > 0){
+                holder.class_date_txt.setText(context.getString(R.string.date_ended_on, dateFormat.format(endDate)));
+            }
+            else {
+                holder.class_date_txt.setText(context.getString(R.string.date_ends_on, dateFormat.format(endDate)));
+            }
+        }
+        else {
+            holder.class_date_txt.setText(context.getString(R.string.date_starts_on, dateFormat.format(startDate)));
+        }
+    }
+
+
+    public static class ClassListViewHolder extends RecyclerView.ViewHolder{
+        public final TextView class_name_txt, class_date_txt;
 
         public ClassListViewHolder(@NonNull View itemView) {
             super(itemView);
             class_name_txt = itemView.findViewById(R.id.class_name_txt);
+            class_date_txt = itemView.findViewById(R.id.class_date_txt);
         }
 
         /*public void bind(String text) {
@@ -106,3 +145,48 @@ public class ClassListAdapter extends RecyclerView.Adapter<ClassListAdapter.Clas
         }*/
     }
 }
+
+        /*if((startDate==null || currentDate.compareTo(startDate) > 0 ) && endDate!=null){
+            holder.class_date_txt.setText(dateFormat.format(endDate));
+        }
+        else if (startDate!=null){
+            holder.class_date_txt.setText(dateFormat.format(startDate));
+        }
+        else {
+            holder.class_date_txt.setText("");
+        }*/
+        /*if(startDate==null){
+            if(endDate==null){
+                holder.class_date_txt.setText("");
+            }
+            else if (currentDate.compareTo(endDate) > 0){
+                holder.class_date_txt.setText(context.getString(R.string.date_ended_on, dateFormat.format(endDate)));
+            }
+            else {
+                holder.class_date_txt.setText(context.getString(R.string.date_ends_on, dateFormat.format(endDate)));
+            }
+        }
+        else if (currentDate.compareTo(startDate) > 0){*/
+
+        /*if(endDate==null) {
+            if(startDate==null) {
+                holder.class_date_txt.setText("");
+            }
+            else if (currentDate.compareTo(startDate) > 0) {
+                holder.class_date_txt.setText(context.getString(R.string.date_started_on, dateFormat.format(startDate)));
+            }
+            else {
+                holder.class_date_txt.setText(dateFormat.format(startDate));
+            }
+        }
+        else if (currentDate.compareTo(endDate) < 0){
+            holder.class_date_txt.setText(context.getString(R.string.date_ends_on, dateFormat.format(endDate)));
+        }
+        else {
+            holder.class_date_txt.setText(context.getString(R.string.date_ended_on, dateFormat.format(endDate)));
+        }
+            /*
+        }
+        else {
+            holder.class_date_txt.setText(dateFormat.format(startDate));
+        }*/
