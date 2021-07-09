@@ -1,5 +1,22 @@
 # Blog Updates
 
+### 7/9/2021: Synchronous Assignment Lists, Updated Appearance and More
+I fixed the issue regarding the assignments list not updating whenever one was added or deleted, including deleting a recently created assignment. It was admittedly frustating to fix, but it works consistently now. I also made a new assignment list adapter called `FilteredAssignmentListAdapter` which extends `AssignmentListAdapter`, which displays a list of assignments that have been "filtered" to meet a certain criteria. Using the `ApplicationViewModel`, whenever an assignment is added, deleted, swiped, or edited, it notifies all other assignment list adapters to update their data as well, making them synchronous. For example, in the `CalendarFragment`, it is used to display assignments that are on the current day selected. If an assignment is edited on that list, all other assignment lists are updated as well. 
+
+I also updated the appearance of the app, with class colors and some reorientation as seen in the screenshots below:
+
+<img src= "https://user-images.githubusercontent.com/44488917/125034932-3293e400-e05f-11eb-85ca-589dcdc5f14f.png" width="250" /><img src= "https://user-images.githubusercontent.com/44488917/125035795-3e33da80-e060-11eb-9203-81494609aa7f.png" width="250" /><img src= "https://user-images.githubusercontent.com/44488917/125035056-53f4d000-e05f-11eb-80d2-29b138f06c57.png" width="250" />
+
+To quickly add the ability to select a class color, I implemented Dhaval2404's [`ColorPicker`](https://github.com/Dhaval2404/ColorPicker). Although I could have made something  similar just by myself, this library was simple to use, worked well and only required me to add about dozen or two new lines of code in total to work. 
+
+<div style="text-align:center"><img src= "https://user-images.githubusercontent.com/44488917/125038066-f3679200-e062-11eb-8873-739f0e526dae.png" width="250"/></div>
+
+Among the other features, the user can set a due time for an assignment. Along with this, the app gives notifications for newly added assignments. They are automatically scheduled for notifying the user 24 hours before it is due using Android's `AlarmManager`. However, it does not seem to completely work, as when an alarm is scheduled to go off well after the app is closed, it does not work. I believe the issue originates from accessing the database when the app is closed. 
+
+There are numerous small issues I have fixed as well, but I have noticed a new one using Android Studio's profiler: memory usage. Comparing to some other apps, mine uses around 30MB more than them, and I imagine it would be more when more assignments and classes are added. I know the likely culprit is the dual assignment/class lists I have, one pair that is directly from the database and another for the UI. I could also convert the `Date` object (~24 bytes of memory) stored in each assignment and class into a `long` (8 bytes of memory) and have the code convert the long into a date when I need it. 
+
+At this point in the app's cycle, I don't believe there are much more features left for me to add that are particularly important. I could add actual settings for the app and more elaborate (and fixed) notifications. Beyond those, I could learn how to integrate this with a website or even make an iOS version of the app. However, this app has reached my level of satisfaction, meeting what I would consider a minimum viable product. Maybe with one last update I will work on getting this app published in the Play store. 
+
 ### 6/19/2021: Major Fixes
 Since my last blog update, I have implemented and fixed everything I described in that post. 
 
