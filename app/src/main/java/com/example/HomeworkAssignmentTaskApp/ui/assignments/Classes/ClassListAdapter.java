@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,11 +13,11 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.HomeworkAssignmentTaskApp.ApplicationViewModel;
+import com.example.HomeworkAssignmentTaskApp.ui.assignments.FormattingHelper;
 import com.example.HomeworkAssignmentTaskApp.R;
 import com.example.HomeworkAssignmentTaskApp.data.ClassData;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
@@ -71,13 +72,13 @@ public class ClassListAdapter extends RecyclerView.Adapter<ClassListAdapter.Clas
         //holder.class_name_txt.setText(viewModel.getClassList().getValue().get(position).getCourseName());
         //holder.class_name_txt.setText(viewModel2.getClassList()..get(position).getCourseName());
         ClassData currentClass = Objects.requireNonNull(appModel.getClassList().getValue()).get(position);
-        holder.class_name_txt.setText(currentClass.getClassName());
+        holder.formatClass(currentClass);
         formatDate(holder, currentClass);
 
         holder.itemView.setOnClickListener(view -> {
             Bundle bundle = new Bundle();
-            bundle.putInt(ClassesFragment.CLASS_ID, currentClass.getClassId());
-            bundle.putInt("tab", 1);
+            bundle.putInt(FormattingHelper.CLASS_ID, currentClass.getClassId());
+            //bundle.putInt("tab", 1);
             Navigation.findNavController(view).navigate(R.id.action_get_class_info, bundle);
         });
     }
@@ -91,10 +92,10 @@ public class ClassListAdapter extends RecyclerView.Adapter<ClassListAdapter.Clas
         Date startDate = currentClass.getStartDate(), endDate = currentClass.getEndDate(),
                 currentDate = new Date(System.currentTimeMillis());
 
-        DateFormat dateFormat = ApplicationViewModel.setDateFormat;
+        DateFormat dateFormat = FormattingHelper.setDateFormat;
         if(startDate==null){
             if(endDate==null){
-                holder.class_date_txt.setText("");
+                holder.class_date_txt.setText(R.string.blank);
             }
             else if (currentDate.compareTo(endDate) > 0){
                 holder.class_date_txt.setText(context.getString(R.string.date_ended_on, dateFormat.format(endDate)));
@@ -126,12 +127,25 @@ public class ClassListAdapter extends RecyclerView.Adapter<ClassListAdapter.Clas
 
 
     public static class ClassListViewHolder extends RecyclerView.ViewHolder{
-        public final TextView class_name_txt, class_date_txt;
+        public final TextView class_name_txt, class_date_txt, class_instructor_txt;
+        public final ImageView class_color;
 
         public ClassListViewHolder(@NonNull View itemView) {
             super(itemView);
             class_name_txt = itemView.findViewById(R.id.class_name_txt);
             class_date_txt = itemView.findViewById(R.id.class_date_txt);
+            class_color = itemView.findViewById(R.id.class_color);
+            class_instructor_txt = itemView.findViewById(R.id.class_instructor_txt);
+        }
+
+        public void formatClass(ClassData classData){
+            class_name_txt.setText(classData.getClassName());
+            if(classData.getInstructorName()!=null) {
+                class_instructor_txt.setText(classData.getInstructorName());
+            }
+            if(classData.getClassColor()!=0){
+                class_color.setBackgroundColor(classData.getClassColor());
+            }
         }
 
         /*public void bind(String text) {

@@ -24,7 +24,6 @@ import java.util.List;
 public class ClassesFragment extends Fragment {
     private ClassListAdapter listAdapter;
     private RecyclerView recyclerView;
-    public static final String CLASS_ID = "class_id";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

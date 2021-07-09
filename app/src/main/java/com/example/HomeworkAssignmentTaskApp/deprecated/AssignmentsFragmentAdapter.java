@@ -1,16 +1,12 @@
-package com.example.HomeworkAssignmentTaskApp.ui.assignments;
+package com.example.HomeworkAssignmentTaskApp.deprecated;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.example.HomeworkAssignmentTaskApp.data.AssignmentData;
-import com.example.HomeworkAssignmentTaskApp.deprecated.ClassObject;
 import com.example.HomeworkAssignmentTaskApp.ui.assignments.Upcoming.UpcomingFragment;
-import com.example.HomeworkAssignmentTaskApp.ui.assignments.Completed.CompletedFragment;
+import com.example.HomeworkAssignmentTaskApp.ui.assignments.Calendar.CalendarFragment;
 import com.example.HomeworkAssignmentTaskApp.ui.assignments.Classes.ClassesFragment;
-
-import java.util.ArrayList;
 
 public class AssignmentsFragmentAdapter extends FragmentStateAdapter {
 
@@ -38,7 +34,7 @@ public class AssignmentsFragmentAdapter extends FragmentStateAdapter {
             case 1:
                 return new ClassesFragment();
             case 2:
-                return new CompletedFragment();
+                return new CalendarFragment();
             default:
                 return new UpcomingFragment();
         }

@@ -27,7 +27,7 @@ public interface ClassDao {
     void insertAll(ClassData... users);
 
     @Insert
-    void insertClass(ClassData classData);
+    long insertClass(ClassData classData);
 
     @Update
     void updateClass(ClassData classData);

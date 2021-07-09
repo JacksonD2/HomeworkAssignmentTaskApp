@@ -10,16 +10,30 @@
         <item>reply_all</item>
     </string-array>
 
-    <string-array name="color_options">
-        <item>Default Color</item>
-        <item>Red</item>
-        <item>Blue</item>
-        <item>Yellow</item>
-        <item>Green</item>
-        <item>Purple</item>
-        <item>Orange</item>
-        <item>Magenta</item>
-        <item>Teal</item>
+    <string-array name="color_options_light">
+        <item>@color/black</item>
+        <item>@color/pink_400</item>
+        <item>@color/red_400</item>
+        <item>@color/orange_400</item>
+        <item>@color/yellow_400</item>
+        <item>@color/green_400</item>
+        <item>@color/blue_400</item>
+        <item>@color/purple_400</item>
+        <item>@color/brown_400</item>
+        <item>@color/grey_600</item>
+    </string-array>
+
+    <string-array name="color_options_dark">
+        <item>@color/white</item>
+        <item>@color/pink_400</item>
+        <item>@color/red_400</item>
+        <item>@color/orange_400</item>
+        <item>@color/yellow_400</item>
+        <item>@color/green_400</item>
+        <item>@color/blue_400</item>
+        <item>@color/purple_400</item>
+        <item>@color/brown_400</item>
+        <item>@color/grey_600</item>
     </string-array>
 
 </resources>

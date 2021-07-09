@@ -14,7 +14,7 @@ public class AssignmentData implements Comparable<AssignmentData> {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "assignmentId")
-    private int assignmentId;
+    private long assignmentId;
 
     @NonNull
     @ColumnInfo(name = "assignmentName")
@@ -55,11 +55,11 @@ public class AssignmentData implements Comparable<AssignmentData> {
 
     //getters and setters
 
-    public int getAssignmentId() {
+    public long getAssignmentId() {
         return assignmentId;
     }
 
-    public void setAssignmentId(int assignmentId) {
+    public void setAssignmentId(long assignmentId) {
         this.assignmentId = assignmentId;
     }
 

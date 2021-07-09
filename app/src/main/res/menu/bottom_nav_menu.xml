@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_upcoming"
+        android:icon="@drawable/ic_baseline_list_24"
+        android:title="@string/tabs_upcoming" />
+    <item
+        android:id="@+id/navigation_classes"
+        android:icon="@drawable/ic_baseline_list_alt_24"
+        android:title="@string/tabs_courses" />
+    <item
+        android:id="@+id/navigation_completed"
+        android:icon="@drawable/ic_baseline_date_range_24"
+        android:title="@string/tabs_completed" />
+</menu>

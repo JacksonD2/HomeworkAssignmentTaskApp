@@ -1,15 +1,12 @@
 package com.example.HomeworkAssignmentTaskApp.ui.assignments.Classes;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
-import androidx.fragment.app.DialogFragment;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
@@ -24,14 +21,18 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.HomeworkAssignmentTaskApp.ApplicationViewModel;
+import com.example.HomeworkAssignmentTaskApp.ui.assignments.FormattingHelper;
 import com.example.HomeworkAssignmentTaskApp.data.ClassData;
 import com.example.HomeworkAssignmentTaskApp.R;
+import com.github.dhaval2404.colorpicker.MaterialColorPickerDialog;
+import com.github.dhaval2404.colorpicker.listener.ColorListener;
+import com.github.dhaval2404.colorpicker.model.ColorShape;
+import com.github.dhaval2404.colorpicker.model.ColorSwatch;
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -43,8 +44,8 @@ public class AddClassFragment extends Fragment implements DatePickerDialog.OnDat
     protected Spinner spinner;
     protected Button buttonStartDate, buttonEndDate, buttonColor, buttonDeleteClass;
     protected Date startDate, endDate;
-    protected final String errorClassName = "Class name must not be blank!";
-    protected final DateFormat dateFormat = ApplicationViewModel.setDateFormat;
+    protected int classColor = 0;
+    protected final static String errorClassName = "Class name must not be blank!";
     //String tab = "tab";
     //int classTab = 1;
     //String startDate = "startDate", endDate = "endDate";
@@ -82,16 +83,45 @@ public class AddClassFragment extends Fragment implements DatePickerDialog.OnDat
         //ViewModel
         appModel = new ViewModelProvider(requireActivity()).get(ApplicationViewModel.class);
 
-        //buttons
-        buttonColor = root.findViewById(R.id.buttonColor);
-        buttonColor.setOnClickListener(v -> {
-
-        });
         //dates
         buttonStartDate = root.findViewById(R.id.buttonStartDate);
         buttonStartDate.setOnClickListener(v -> showDatePickerDialog(buttonStartDate));
         buttonEndDate = root.findViewById(R.id.buttonEndDate);
         buttonEndDate.setOnClickListener(v -> showDatePickerDialog(buttonEndDate));
+
+        //color
+        buttonColor = root.findViewById(R.id.buttonColor);
+        buttonColor.setOnClickListener(v -> {
+            int colorArray;
+            if ((getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) ==
+                    Configuration.UI_MODE_NIGHT_YES) {
+                colorArray = R.array.color_options_dark;
+            } else {
+                colorArray = R.array.color_options_light;
+            }
+
+            new MaterialColorPickerDialog
+                    .Builder(requireContext())
+                    .setTitle(R.string.pick_a_color)
+                    .setColorShape(ColorShape.SQAURE)
+                    .setTickColorPerCard(true)
+                    .setColorRes(getResources().getIntArray(colorArray))
+                    .setColorListener((color, colorHex) -> {
+                        // Handle Color Selection
+                        if(color == ContextCompat.getColor(requireContext(), R.color.black) ||
+                                color == ContextCompat.getColor(requireContext(), R.color.white)){
+                            classColor = 0;
+                            buttonColor.setBackgroundColor(MaterialColors.getColor(root, R.attr.colorOnBackground));
+                            //buttonColor.setText(R.string.default_text);
+                        }
+                        else {
+                            classColor = color;
+                            buttonColor.setBackgroundColor(classColor);
+                            //buttonColor.setText(R.string.class_blank);
+                        }
+                    })
+                    .show();
+        });
 
         return root;
     }
@@ -122,6 +152,7 @@ public class AddClassFragment extends Fragment implements DatePickerDialog.OnDat
             if(endDate!=null){
                 classInfo.setEndDate(endDate);
             }
+            classInfo.setClassColor(classColor);
 
             return classInfo;
         }
@@ -148,7 +179,7 @@ public class AddClassFragment extends Fragment implements DatePickerDialog.OnDat
         Calendar c = Calendar.getInstance();
         c.set(i, i1, i2);
         Date dateSet = c.getTime();
-        String text = ApplicationViewModel.setDateFormat.format(dateSet);
+        String text = FormattingHelper.setDateFormat.format(dateSet);
         if(datePicker.getTag().equals(buttonStartDate)) {
             buttonStartDate.setText(text);
             startDate = dateSet;

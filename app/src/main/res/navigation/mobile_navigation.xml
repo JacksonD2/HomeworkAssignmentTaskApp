@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/splashScreenFragment">
+    app:startDestination="@id/nav_assignments">
 
     <fragment
         android:id="@+id/nav_assignments"
@@ -34,7 +34,7 @@
 
     <fragment
         android:id="@+id/nav_settings"
-        android:name="com.example.HomeworkAssignmentTaskApp.ui.Settings.SettingsFragment"
+        android:name="com.example.HomeworkAssignmentTaskApp.ui.SettingsFragment"
         android:label="@string/menu_settings"
         tools:layout="@layout/fragment_settings" />
     <fragment
@@ -67,15 +67,14 @@
     <fragment
         android:id="@+id/nav_edit_class"
         android:name="com.example.HomeworkAssignmentTaskApp.ui.assignments.Classes.EditClassFragment"
-        android:label="@string/menu_edit_class"
-        tools:layout="@layout/fragment_add_class" >
+        android:label="@string/menu_edit_class">
         <action
             android:id="@+id/action_nav_edit_class_to_nav_assignments"
             app:destination="@id/nav_assignments" />
     </fragment>
     <fragment
         android:id="@+id/splashScreenFragment"
-        android:name="com.example.HomeworkAssignmentTaskApp.ui.SplashScreenFragment"
+        android:name="com.example.HomeworkAssignmentTaskApp.deprecated.SplashScreenFragment"
         android:label="Welcome!"
         tools:layout="@layout/fragment_splash_screen">
         <action
@@ -91,7 +90,15 @@
         android:id="@+id/nav_assignment_info"
         android:name="com.example.HomeworkAssignmentTaskApp.ui.assignments.Upcoming.AssignmentInfoFragment"
         android:label="Assignment Details"
-        tools:layout="@layout/fragment_assignment_info" />
+        tools:layout="@layout/fragment_assignment_info" >
+        <action
+            android:id="@+id/action_edit_assignment"
+            app:destination="@id/editAssignmentFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/editAssignmentFragment"
+        android:name="com.example.HomeworkAssignmentTaskApp.ui.assignments.Upcoming.EditAssignmentFragment"
+        android:label="@string/menu_edit_assignment" />
 
     <!--<fragment
         android:id="@+id/nav_gallery"

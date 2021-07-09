@@ -1,8 +1,12 @@
 package com.example.HomeworkAssignmentTaskApp.data;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
+import androidx.core.os.HandlerCompat;
+import androidx.lifecycle.MutableLiveData;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -34,13 +38,12 @@ public abstract class AppDatabase extends RoomDatabase {
         return instance;
     }
 
-    private static RoomDatabase.Callback sRoomDatabaseCallback = new RoomDatabase.Callback() {
+    private static final RoomDatabase.Callback sRoomDatabaseCallback = new RoomDatabase.Callback() {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
 
-            // If you want to keep data through app restarts,
-            // comment out the following block
+            Handler mainThreadHandler = HandlerCompat.createAsync(Looper.getMainLooper());
             databaseWriteExecutor.execute(() -> {
                 // Populate the database in the background.
                 // If you want to start with more words, just add them.
@@ -74,6 +77,11 @@ public abstract class AppDatabase extends RoomDatabase {
                 classDao.deleteAll();
                 classDao.insertClass(new ClassData("English"));
                 classDao.insertClass(new ClassData("Art"));
+
+                mainThreadHandler.post(() -> {
+                    //assignmentListLoaded.setValue(true);
+                    System.out.println(9999);
+                });
             });
         }
     };

@@ -24,6 +24,7 @@ android {
         }
     }
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -37,10 +38,14 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
-    //notifications
-    implementation 'androidx.core:core:1.5.0'
+    //rxjava
+    implementation "androidx.room:room-rxjava2:$room_version"
+    implementation "androidx.room:room-rxjava3:$room_version"
 
-    //lifecyle
+    //notifications
+    implementation 'androidx.core:core:1.6.0'
+
+    //lifecycle
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     //annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
 
@@ -48,7 +53,7 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
 
     //material design
-    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'com.google.android.material:material:1.4.0'
 
     //task list implementations
     implementation "androidx.cardview:cardview:1.0.0"
@@ -67,6 +72,14 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.preference:preference:1.1.1'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    //implementation 'com.google.android.flexbox:flexbox:3.0.0'
+
+    //color picker
+    implementation 'com.github.dhaval2404:colorpicker:2.0'
+
+    //custom calendar
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+    implementation 'com.github.kizitonwose:CalendarView:1.0.4'
 }

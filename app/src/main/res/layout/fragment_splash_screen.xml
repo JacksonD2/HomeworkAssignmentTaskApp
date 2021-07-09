@@ -4,7 +4,7 @@
     android:id="@+id/RelativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.SplashScreenFragment">
+    tools:context=".deprecated.SplashScreenFragment">
 
     <TextView
         android:layout_width="wrap_content"
@@ -12,7 +12,7 @@
         android:layout_above="@+id/buttonOpenApp"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="4dp"
-        android:text="Welcome!"
+        android:text="@string/welcome"
         android:textSize="24sp" />
 
     <Button
@@ -20,6 +20,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="Open app" />
+        android:text="@string/open_app" />
 
 </RelativeLayout>

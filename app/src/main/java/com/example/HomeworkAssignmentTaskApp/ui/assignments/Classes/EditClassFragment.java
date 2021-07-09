@@ -2,24 +2,20 @@ package com.example.HomeworkAssignmentTaskApp.ui.assignments.Classes;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.HomeworkAssignmentTaskApp.ApplicationViewModel;
+import com.example.HomeworkAssignmentTaskApp.ui.assignments.FormattingHelper;
 import com.example.HomeworkAssignmentTaskApp.R;
 import com.example.HomeworkAssignmentTaskApp.data.ClassData;
-import com.example.HomeworkAssignmentTaskApp.ui.assignments.AssignmentsFragment;
-import com.example.HomeworkAssignmentTaskApp.ui.assignments.Upcoming.AddAssignmentFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.jetbrains.annotations.NotNull;
@@ -40,22 +36,11 @@ public class EditClassFragment extends AddClassFragment {
                              Bundle savedInstanceState) {
         //View root = inflater.inflate(R.layout.fragment_add_class, container, false);
         View root = setUpViews(inflater, container);
-        System.out.println("Reached Here!1");
-
-        appModel.getDeletedClassId().observe(getViewLifecycleOwner(), integer -> {
-            System.out.println("Reached Here!99");
-            appModel.deleteClassById();
-            //appModel.getDeletedClassId().removeObservers(getViewLifecycleOwner());
-            //Navigation.findNavController(requireView()).navigate(R.id.nav_assignments, getArguments());
-            Navigation.findNavController(requireView()).navigateUp();
-            Navigation.findNavController(requireView()).navigateUp();
-        });
-        System.out.println("Reached Here!2");
 
         //class data
         ClassData classInfo;
         if(getArguments()!=null) {
-            classId = getArguments().getInt(ClassesFragment.CLASS_ID);
+            classId = getArguments().getInt(FormattingHelper.CLASS_ID);
             classInfo = appModel.getClassData(classId);
         }
         else {
@@ -76,13 +61,19 @@ public class EditClassFragment extends AddClassFragment {
         //dates
         Date date = classInfo.getStartDate();
         if(date!=null) {
-            temp = dateFormat.format(date);
+            temp = FormattingHelper.setDateFormat.format(date);
             buttonStartDate.setText(temp);
         }
         date = classInfo.getEndDate();
         if(date!=null) {
-            temp = dateFormat.format(date);
+            temp = FormattingHelper.setDateFormat.format(date);
             buttonEndDate.setText(temp);
+        }
+
+        //color
+        if((classColor = classInfo.getClassColor())!=0){
+            buttonColor.setBackgroundColor(classColor);
+            buttonColor.setText(R.string.blank);
         }
 
         //fab
@@ -97,7 +88,21 @@ public class EditClassFragment extends AddClassFragment {
         //delete class
         buttonDeleteClass = root.findViewById(R.id.buttonDeleteClass);
         buttonDeleteClass.setOnClickListener(v -> deleteClass());
-        System.out.println("Reached Here!3");
+
+        System.out.println("Reached Here!1");
+
+        appModel.getDeletedClassId().observe(getViewLifecycleOwner(), integer -> {
+            if(integer==classId) {
+                System.out.println("Reached Here!99");
+                appModel.deleteClassById();
+                //appModel.getDeletedClassId().removeObservers(getViewLifecycleOwner());
+                //Navigation.findNavController(requireView()).navigate(R.id.nav_assignments, getArguments());
+                appModel.assignmentListModified.setValue(null);
+                Navigation.findNavController(requireView()).navigateUp();
+                Navigation.findNavController(requireView()).navigateUp();
+            }
+        });
+        System.out.println("Reached Here!2");
 
         return root;
     }

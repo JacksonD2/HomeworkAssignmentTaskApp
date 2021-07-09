@@ -1,18 +1,22 @@
 package com.example.HomeworkAssignmentTaskApp;
 
+import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.HomeworkAssignmentTaskApp.data.AssignmentData;
-import com.example.HomeworkAssignmentTaskApp.data.ClassData;
-import com.example.HomeworkAssignmentTaskApp.deprecated.ClassObject;
+import com.example.HomeworkAssignmentTaskApp.ui.assignments.FormattingHelper;
+import com.example.HomeworkAssignmentTaskApp.ui.assignments.ListHelper;
 import com.google.android.material.navigation.NavigationView;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -22,13 +26,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String CHANNEL_ID = "Main_Channel";
     private AppBarConfiguration mAppBarConfiguration;
+    private NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,18 +42,36 @@ public class MainActivity extends AppCompatActivity {
 
         //ViewModel
         ApplicationViewModel appViewModel = new ViewModelProvider(this).get(ApplicationViewModel.class);
-        appViewModel.getClassList().observe(this, classData -> {
-            //appViewModel.appDatabase.classDao().getAllClasses();
+        appViewModel.getClassList().observe(this, classData -> { });
+        appViewModel.getAssignmentList().observe(this, assignmentData -> { });
+        appViewModel.getIncompleteAssignmentList().observe(this, assignmentData -> { });
+        appViewModel.getCompleteAssignmentList().observe(this, assignmentData -> { });
+        appViewModel.newAssignment.observe(this, assignmentData -> {
+            if(assignmentData!=null) {
+                if (assignmentData.isComplete())
+                    ListHelper.sortedInsert(assignmentData, appViewModel.sCompleteAssignmentList);
+                else
+                    ListHelper.sortedInsert(assignmentData, appViewModel.sIncompleteAssignmentList);
+                createReminder(assignmentData);
+                Toast.makeText(this, this.getString(R.string.assignment_successfully_added,
+                        assignmentData.getAssignmentName()), Toast.LENGTH_SHORT).show();
+                appViewModel.assignmentListModified.setValue(null);
+            }
         });
-        appViewModel.getAssignmentList().observe(this, assignmentData -> {
-
+        appViewModel.getDeletedAssignmentId().observe(this, v -> {
+            String assignmentName = appViewModel.deleteAssignment(v);
+            if(!assignmentName.equals("")) {
+                Toast.makeText(this, this.getString(R.string.assignment_successfully_deleted,
+                        assignmentName), Toast.LENGTH_SHORT).show();
+            }
+            //appViewModel.assignmentListModified.setValue(null);
+            /*if(appViewModel.isAssignmentDeleted()){
+                String assignmentName = appViewModel.deleteAssignment(v);
+                Toast.makeText(this, this.getString(R.string.assignment_successfully_deleted,
+                        assignmentName), Toast.LENGTH_SHORT).show();
+            }*/
         });
-        appViewModel.getIncompleteAssignmentList().observe(this, assignmentData -> {
-
-        });
-        appViewModel.getCompleteAssignmentList().observe(this, assignmentData -> {
-
-        });
+        appViewModel.assignmentListModified.observe(this, v -> { });
 
         //Action/tool bar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -62,11 +84,10 @@ public class MainActivity extends AppCompatActivity {
         NavigationView navigationView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_assignments, R.id.nav_settings)
-                .setOpenableLayout(drawer)
+        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_assignments)
+                //.setOpenableLayout(drawer)
                 .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
     }
@@ -85,6 +106,17 @@ public class MainActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_settings) {
+            // User chose the "Settings" item, show the app settings UI...
+            navController.navigate(R.id.nav_settings);
+            return true;
+        }// If we got here, the user's action was not recognized.
+        // Invoke the superclass to handle it.
+        return super.onOptionsItemSelected(item);
+    }
+
     private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
@@ -99,6 +131,21 @@ public class MainActivity extends AppCompatActivity {
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
+    }
+
+    private void createReminder(AssignmentData assignmentData){
+        Intent intent = new Intent(this, ReminderBroadcast.class);
+        intent.putExtra(FormattingHelper.ASSIGNMENT_ID, assignmentData.getAssignmentId());
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,
+                0, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Calendar c = Calendar.getInstance();
+        c.setTime(assignmentData.getDueDate());
+        //c.set(Calendar.MINUTE, 0);
+        //c.set(Calendar.HOUR_OF_DAY, 0);
+        c.add(Calendar.DAY_OF_YEAR, -1); //sets reminder 24 hours before assignment is due
+        alarmManager.set(AlarmManager.RTC_WAKEUP, c.getTime().getTime(), pendingIntent);
+        //alarmManager.set(AlarmManager.RTC_WAKEUP, dueDate.getTime(), );
     }
 }
 

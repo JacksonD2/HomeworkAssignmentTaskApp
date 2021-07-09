@@ -1,4 +1,4 @@
-package com.example.HomeworkAssignmentTaskApp.ui;
+package com.example.HomeworkAssignmentTaskApp.deprecated;
 
 import android.os.Bundle;
 
@@ -12,11 +12,6 @@ import android.widget.Button;
 
 import com.example.HomeworkAssignmentTaskApp.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SplashScreenFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class SplashScreenFragment extends Fragment {
 
     public SplashScreenFragment() {
@@ -35,12 +30,7 @@ public class SplashScreenFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_splash_screen, container, false);
 
         Button openApp = root.findViewById(R.id.buttonOpenApp);
-        openApp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Navigation.findNavController(view).navigate(R.id.action_open_app);
-            }
-        });
+        openApp.setOnClickListener(view -> Navigation.findNavController(view).navigate(R.id.action_open_app));
 
         return root;
     }

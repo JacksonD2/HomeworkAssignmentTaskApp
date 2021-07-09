@@ -1,10 +1,21 @@
 package com.example.HomeworkAssignmentTaskApp.data;
 
 import android.app.Application;
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 
+import androidx.core.os.HandlerCompat;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
+import com.example.HomeworkAssignmentTaskApp.ApplicationViewModel;
 
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AppRepository {
 
@@ -12,19 +23,36 @@ public class AppRepository {
     private AssignmentDao mAssignmentDao;
     private LiveData<List<AssignmentData>> mAllAssignments, mIncompleteAssignments, mCompleteAssignments;
     private LiveData<List<ClassData>> mAllClasses;
+    private MutableLiveData<Boolean> assignmentListLoaded;
+    private AppDatabase db;
+    //private LiveData<int[]> assignmentIds;
+    //private final MutableLiveData<Boolean> assignmentListModified;
 
     // Note that in order to unit test the WordRepository, you have to remove the Application
     // dependency. This adds complexity and much more code, and this sample is not about testing.
     // See the BasicSample in the android-architecture-components repository at
     // https://github.com/googlesamples
-    public AppRepository(Application application) {
-        AppDatabase db = AppDatabase.getInstance(application);
+    public AppRepository(Context context) {
+        AppDatabase db = AppDatabase.getInstance(context);
         mClassDao = db.classDao();
         mAssignmentDao = db.assignmentDao();
         mAllClasses = mClassDao.getAllClasses();
         mAllAssignments = mAssignmentDao.getAllAssignments();
         mIncompleteAssignments = mAssignmentDao.getIncompleteAssignments();
         mCompleteAssignments = mAssignmentDao.getCompleteAssignments();
+    }
+
+    public AppRepository (Application application, MutableLiveData<Boolean> assignmentListLoaded) {
+        db = AppDatabase.getInstance(application);
+        mClassDao = db.classDao();
+        mAssignmentDao = db.assignmentDao();
+        mAllClasses = mClassDao.getAllClasses();
+        mAllAssignments = mAssignmentDao.getAllAssignments();
+        mIncompleteAssignments = mAssignmentDao.getIncompleteAssignments();
+        mCompleteAssignments = mAssignmentDao.getCompleteAssignments();
+        this.assignmentListLoaded = assignmentListLoaded;
+        //assignmentIds = mAssignmentDao.getAssignmentIds();
+        //this.assignmentListModified = assignmentListModified;
     }
 
     public LiveData<List<ClassData>> getAllClasses() {
@@ -36,6 +64,16 @@ public class AppRepository {
     }
 
     public LiveData<List<AssignmentData>> getIncompleteAssignments() {
+        Executor executor = Executors.newSingleThreadExecutor();
+        Handler mainThreadHandler = HandlerCompat.createAsync(Looper.getMainLooper());
+        executor.execute(() -> {
+            if (mIncompleteAssignments.getValue() == null){
+                //noinspection StatementWithEmptyBody
+                while (mIncompleteAssignments.getValue() == null || mAllClasses.getValue() == null);
+                //waits until database is instantiated
+                mainThreadHandler.post(() -> assignmentListLoaded.setValue(true));
+            }
+        } );
         return mIncompleteAssignments;
     }
 
@@ -65,11 +103,59 @@ public class AppRepository {
         });
     }
 
-    public void insertAssignment(AssignmentData assignmentData) {
-        AppDatabase.databaseWriteExecutor.execute(() -> mAssignmentDao.insertAssignment(assignmentData));
+    public void insertAssignment(AssignmentData assignmentData, ApplicationViewModel viewModel) {
+        Handler mainThreadHandler = HandlerCompat.createAsync(Looper.getMainLooper());
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            long rowId = mAssignmentDao.insertAssignment(assignmentData);
+            //AssignmentData assignmentInfo = getAssignment(rowId);
+
+            mainThreadHandler.post(() -> {
+                Log.d(null, "rowId is: " + rowId);
+                viewModel.setAssignmentInserted(true);
+                //viewModel.newAssignment.setValue(assignmentInfo);
+                assignmentData.setAssignmentId(rowId);
+                viewModel.newAssignment.setValue(assignmentData);
+            });
+        });
     }
 
     public void updateAssignment(AssignmentData assignmentData) {
         AppDatabase.databaseWriteExecutor.execute(() -> mAssignmentDao.updateAssignment(assignmentData));
+    }
+
+    public void deleteAssignment(AssignmentData assignmentData) {
+        AppDatabase.databaseWriteExecutor.execute(() -> mAssignmentDao.deleteAssignment(assignmentData));
+    }
+
+    public void deleteAssignment(int assignmentId) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            AssignmentDao.AssignmentId temp = new AssignmentDao.AssignmentId();
+            temp.assignmentId = assignmentId;
+            mAssignmentDao.deleteAssignment(temp);
+        });
+    }
+
+    public void deleteAssignment(long assignmentId) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            AssignmentDao.AssignmentId temp = new AssignmentDao.AssignmentId();
+            temp.assignmentId = assignmentId;
+            mAssignmentDao.deleteAssignment(temp);
+        });
+    }
+
+    //public LiveData<int[]> getAssignmentIds(){return assignmentIds;}
+
+    /*public boolean isAssignment(long assignmentId){
+        /*AtomicBoolean isAssignment = new AtomicBoolean(false);
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            isAssignment.set(mAssignmentDao.isAssignment(assignmentId));
+        });
+
+        return isAssignment.get();
+        return mAssignmentDao.isAssignment(assignmentId);
+    }*/
+
+    public AssignmentData getAssignment(long assignmentId) {
+        return mAssignmentDao.getAssignmentById(assignmentId);
     }
 }

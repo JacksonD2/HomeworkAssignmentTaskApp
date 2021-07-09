@@ -32,7 +32,7 @@ public class ClassData {
     private Date endDate;
 
     @ColumnInfo(name = "classColor")
-    private String classColor;
+    private int classColor = 0;
 
 
     public ClassData(){}
@@ -86,10 +86,10 @@ public class ClassData {
         return endDate;
     }
 
-    public void setClassColor(String color){
+    public void setClassColor(int color){
         classColor = color;
     }
-    public String getClassColor(){
+    public int getClassColor(){
         return classColor;
     }
 

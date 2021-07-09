@@ -1,4 +1,4 @@
-package com.example.HomeworkAssignmentTaskApp.ui.Settings;
+package com.example.HomeworkAssignmentTaskApp.ui;
 
 import android.os.Bundle;
 
@@ -20,6 +20,8 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root =  inflater.inflate(R.layout.fragment_settings, container, false);
+
+        //more to be added
 
         return root;
     }

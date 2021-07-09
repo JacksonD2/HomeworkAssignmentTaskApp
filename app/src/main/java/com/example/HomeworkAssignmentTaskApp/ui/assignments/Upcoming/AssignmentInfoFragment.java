@@ -13,16 +13,18 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.HomeworkAssignmentTaskApp.ApplicationViewModel;
+import com.example.HomeworkAssignmentTaskApp.data.ClassData;
+import com.example.HomeworkAssignmentTaskApp.ui.assignments.FormattingHelper;
 import com.example.HomeworkAssignmentTaskApp.R;
 import com.example.HomeworkAssignmentTaskApp.data.AssignmentData;
+import com.example.HomeworkAssignmentTaskApp.ui.assignments.ListHelper;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class AssignmentInfoFragment extends Fragment {
 
-    protected int currentAssignment;
+    protected long currentAssignment;
     protected Button buttonCompleteAssignment;
 
     public AssignmentInfoFragment() {
@@ -38,47 +40,44 @@ public class AssignmentInfoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_assignment_info, container, false);
+
         //ViewModel
         ApplicationViewModel appModel = new ViewModelProvider(requireActivity()).get(ApplicationViewModel.class);
 
         //Assignment Info
         //currentAssignment = getArguments().getInt("position");
         if (getArguments() != null) {
-            currentAssignment = getArguments().getInt(UpcomingFragment.ASSIGNMENT_ID);
+            currentAssignment = getArguments().getLong(FormattingHelper.ASSIGNMENT_ID);
 
-        /*AssignmentData assignmentInfo = null;
-        for(AssignmentData assignmentData: appModel.getAssignmentList().getValue()){
-            if(assignmentData.getAssignmentId()==currentAssignment){
-                assignmentInfo = assignmentData;
-                break;
-            }
-        }*/
             AssignmentData assignmentInfo = appModel.getAssignmentData(currentAssignment);
-            if (assignmentInfo == null) {
-                assignmentInfo = new AssignmentData("error");
-            }
+            if (assignmentInfo == null) assignmentInfo = new AssignmentData("error");
             String temp;
+
             //Assignment Name
             TextView assignmentName = root.findViewById(R.id.textViewAssignmentName);
             assignmentName.setText(assignmentInfo.getAssignmentName());
             //Class Name
             int classId = assignmentInfo.getClassId();
-            if (classId != -1) {
+            ClassData classData = appModel.getClassData(classId);
+            if (classData!=null) {
                 TextView className = root.findViewById(R.id.textViewAssignmentClassName);
-                className.setText(appModel.getClassData(classId).getClassName());
+                className.setText(classData.getClassName());
             }
             //Priority
             TextView priority = root.findViewById(R.id.textViewAssignmentPriority);
             int priorityNum = assignmentInfo.getPriority();
-            setPriority(priority, priorityNum);
+            FormattingHelper.setPriority(priority, priorityNum);
 
-            //Due Date
-            TextView dueDate = root.findViewById(R.id.textViewAssignmentDueDate);
+            //Due Date/Time
+            TextView dueDate = root.findViewById(R.id.textViewAssignmentDueDate),
+                    dueTime = root.findViewById(R.id.textViewAssignmentDueTime);
             Date date = assignmentInfo.getDueDate();
             if (date != null) {
-                dueDate.setText(ApplicationViewModel.setDateFormat.format(date));
+                dueDate.setText(FormattingHelper.setDateFormat.format(date));
+                dueTime.setText(FormattingHelper.timeFormat.format(date));
             } else {
                 dueDate.setText("");
+                dueTime.setText("");
             }
             //Description
             TextView description = root.findViewById(R.id.textViewAssignmentDescription);
@@ -90,28 +89,33 @@ public class AssignmentInfoFragment extends Fragment {
             //Complete Assignment Button
             buttonCompleteAssignment = root.findViewById(R.id.buttonCompleteAssignment);
             AssignmentData finalAssignmentInfo = assignmentInfo;
-            if (assignmentInfo.isComplete()) {
+            if (assignmentInfo.isComplete())
                 buttonCompleteAssignment.setVisibility(View.GONE);
-            } else {
+            else {
                 buttonCompleteAssignment.setOnClickListener(view -> {
                     finalAssignmentInfo.setComplete(true);
                     appModel.updateAssignment(finalAssignmentInfo);
+                    ListHelper.removeAssignment(finalAssignmentInfo, appModel.sIncompleteAssignmentList);
+                    ListHelper.sortedInsert(finalAssignmentInfo, appModel.sCompleteAssignmentList);
+                    appModel.assignmentListModified.setValue(null);
                     Navigation.findNavController(view).navigateUp();
                 });
             }
+
+
+            FloatingActionButton fabEditAssignment = root.findViewById(R.id.fabEditAssignment);
+            fabEditAssignment.setOnClickListener(view -> {
+                Bundle bundle;
+
+                if (getArguments() != null) bundle = getArguments();
+                else bundle = new Bundle();
+                bundle.putLong(FormattingHelper.ASSIGNMENT_ID, currentAssignment);
+
+                Navigation.findNavController(root).navigate(R.id.action_edit_assignment, bundle);
+            });
         }
 
 
         return root;
-    }
-
-    public static void setPriority(TextView p, int pNum){
-        String[] priorities = p.getResources().getStringArray(R.array.priorities);
-        if(pNum>=0 && pNum<priorities.length){
-            p.setText(priorities[pNum]);
-        }
-        else {
-            p.setText(p.getResources().getString(R.string.data_error));
-        }
     }
 }

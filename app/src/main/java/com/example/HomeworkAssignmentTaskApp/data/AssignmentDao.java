@@ -9,6 +9,8 @@ import androidx.room.Update;
 
 import java.util.List;
 
+import kotlinx.coroutines.flow.Flow;
+
 @Dao
 public interface AssignmentDao {
     @Query("Select * from assignments")
@@ -20,6 +22,15 @@ public interface AssignmentDao {
     @Query("Select * from assignments Where isComplete = 1")
     LiveData<List<AssignmentData>> getCompleteAssignments();
 
+    @Query("Select * from assignments Where assignmentId = :id Limit 1")
+    AssignmentData getAssignmentById(long id);
+
+    /*@Query("Select assignmentId from assignments")
+    LiveData<int[]> getAssignmentIds();*/
+
+    /*@Query("SELECT EXISTS(SELECT 1 FROM assignments WHERE assignmentId = :id)")
+    LiveData<Boolean> isAssignment(long id);*/
+
     @Query("DELETE FROM assignments")
     void deleteAll();
 
@@ -27,11 +38,22 @@ public interface AssignmentDao {
     void insertAll(AssignmentData... assignments);
 
     @Insert
-    void insertAssignment(AssignmentData assignmentData);
+    long insertAssignment(AssignmentData assignmentData);
 
     @Update
     void updateAssignment(AssignmentData assignmentData);
 
     @Delete
     void deleteAssignment(AssignmentData assignmentData);
+
+    @Delete(entity = AssignmentData.class)
+    void deleteAssignment(AssignmentId... assignmentIds);
+
+    /*// RX Java
+    @Query("Select * from assignments")
+    Flowable<List<AssignmentData>> getItemList();*/
+
+    class AssignmentId {
+        public long assignmentId;
+    }
 }

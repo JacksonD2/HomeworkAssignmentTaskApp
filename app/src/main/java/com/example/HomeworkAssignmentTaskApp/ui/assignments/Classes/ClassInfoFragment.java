@@ -5,6 +5,9 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,15 +15,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.HomeworkAssignmentTaskApp.ApplicationViewModel;
+import com.example.HomeworkAssignmentTaskApp.data.AssignmentData;
+import com.example.HomeworkAssignmentTaskApp.ui.assignments.Calendar.FilteredAssignmentListAdapter;
+import com.example.HomeworkAssignmentTaskApp.ui.assignments.FormattingHelper;
 import com.example.HomeworkAssignmentTaskApp.R;
 import com.example.HomeworkAssignmentTaskApp.data.ClassData;
-import com.example.HomeworkAssignmentTaskApp.ui.assignments.AssignmentsFragment;
+import com.example.HomeworkAssignmentTaskApp.ui.assignments.SwipeCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class ClassInfoFragment extends Fragment {
 
@@ -45,7 +50,7 @@ public class ClassInfoFragment extends Fragment {
 
         //class info
         if (getArguments() != null) {
-            classId = getArguments().getInt(ClassesFragment.CLASS_ID);
+            classId = getArguments().getInt(FormattingHelper.CLASS_ID);
 
             ClassData classInfo = appModel.getClassData(classId);
             String temp;
@@ -63,16 +68,28 @@ public class ClassInfoFragment extends Fragment {
             TextView startDate = root.findViewById(R.id.textViewStartDate);
             Date date = classInfo.getStartDate();
             if (date != null) {
-                temp = ApplicationViewModel.setDateFormat.format(date);
+                temp = FormattingHelper.setDateFormat.format(date);
                 startDate.setText(temp);
             }
             //end date
             TextView endDate = root.findViewById(R.id.textViewEndDate);
             date = classInfo.getEndDate();
             if (date != null) {
-                temp = ApplicationViewModel.setDateFormat.format(date);
+                temp = FormattingHelper.setDateFormat.format(date);
                 endDate.setText(temp);
             }
+
+            RecyclerView classTaskList = root.findViewById(R.id.classTaskList);
+            FilteredAssignmentListAdapter listAdapter =
+                    new FilteredAssignmentListAdapter(getContext(), appModel,
+                            getClassAssignments(appModel.sIncompleteAssignmentList.getValue()),
+                            getClassAssignments(appModel.sCompleteAssignmentList.getValue()));
+            ItemTouchHelper.SimpleCallback itemTouchHelperCallback =
+                    new SwipeCallback(0, ItemTouchHelper.RIGHT|ItemTouchHelper.LEFT,
+                            listAdapter, requireContext(), classTaskList);
+            new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(classTaskList);
+            classTaskList.setAdapter(listAdapter);
+            classTaskList.setLayoutManager(new LinearLayoutManager(getContext()));
 
             //fab
             FloatingActionButton fab = root.findViewById(R.id.fabEditClass);
@@ -84,7 +101,7 @@ public class ClassInfoFragment extends Fragment {
                 } else {
                     bundle = new Bundle();
                 }
-                bundle.putInt(ClassesFragment.CLASS_ID, classId);
+                bundle.putInt(FormattingHelper.CLASS_ID, classId);
 
                 Navigation.findNavController(root).navigate(R.id.action_edit_class, bundle);
                 //Navigation.findNavController(root).navigate(R.id.action_exit_add_class);
@@ -104,5 +121,19 @@ public class ClassInfoFragment extends Fragment {
         }
 
         return root;
+    }
+
+    private List<AssignmentData> getClassAssignments(List<AssignmentData> list){
+        List<AssignmentData> temp = new ArrayList<>();
+
+        if(list!=null) {
+            for (AssignmentData assignmentData : list) {
+                if (assignmentData.getClassId() == classId) {
+                    temp.add(assignmentData);
+                }
+            }
+        }
+
+        return temp;
     }
 }

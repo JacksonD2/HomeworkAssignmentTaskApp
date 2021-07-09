@@ -7,6 +7,18 @@
     tools:context=".ui.assignments.Classes.ClassInfoFragment">
 
     <TextView
+        android:id="@+id/class_task_list_txt"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/class_tasks"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewStartDate" />
+
+    <TextView
         android:id="@+id/textView9"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
@@ -21,7 +33,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/class_blank"
+        android:text="@string/blank"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@+id/textViewStartDate"
         app:layout_constraintEnd_toEndOf="parent"
@@ -44,7 +56,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:text="@string/class_blank"
+        android:text="@string/blank"
         android:textSize="18sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintStart_toStartOf="@+id/textView3"
@@ -67,7 +79,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/class_blank"
+        android:text="@string/blank"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
@@ -105,6 +117,15 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/classTaskList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/fabEditClass"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/class_task_list_txt" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabEditClass"
         android:layout_width="wrap_content"
@@ -112,7 +133,10 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="32dp"
         android:clickable="true"
+        android:contentDescription="@string/menu_edit_class"
         android:src="@drawable/ic_baseline_edit_24"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:focusable="true" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
